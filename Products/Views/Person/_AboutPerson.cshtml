@@ -1,0 +1,79 @@
+﻿@using Products.Models
+@model Products.Models.PersonViewModel
+@{
+    var db = new ApplicationDbContext();
+    var nationalities = new SelectList(db.Nationalities.OrderBy(x => x.Name).Select(x => new { x.Id, Name = x.Name }).ToList(), "Id", "Name");
+    var roles = new SelectList(db.Roles.OrderBy(x => x.Name).Select(x => new { x.Id, Name = x.Name }).ToList(), "Id", "Name");
+}
+<div class="row text-left col-md-12" id="AboutPerson">
+    @if (User.IsInRole("Admin"))
+    {
+        using (Html.BeginForm("UpdatePerson", "Person", FormMethod.Post, new { Id = "FormCreateUser", @class = "text-left", data_success = "Updated!", data_failure = "Could not update" }))
+        {
+            @Html.HiddenFor(m=>m.Id)
+            @Html.HiddenFor(m=>m.UserName)
+            @Html.HiddenFor(m=>m.Document)
+            @Html.HiddenFor(m=>m.Email)
+            @Html.HiddenFor(m=>m.Name)
+            @Html.HiddenFor(m=>m.LastName)
+            <div class="form-group row">
+                @Html.LabelFor(m => m.RoleId, new { @class = "col-md-2 control-label" })
+                <div class="col-md-6">
+                    @Html.DropDownListFor(m => m.RoleId, roles, "--SELECT--", new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.RoleId, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="form-group row">
+                @Html.LabelFor(m => m.DateBirth, new { @class = "col-md-2 control-label" })
+                <div class="col-md-6">
+                    @Html.TextBoxFor(m => m.DateBirth, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+                    @Html.ValidationMessageFor(m => m.Age, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="form-group row">
+                @Html.LabelFor(m => m.Gender, new { @class = "col-md-2 control-label" })
+                <div class="col-md-6">
+                    @Html.EnumDropDownListFor(m => m.Gender, "--SELECT--", new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.Gender, "", new { @class = "text-danger" })
+                </div>
+            </div>
+            <div class="form-group row">
+                @Html.LabelFor(m => m.NationalityId, new { @class = "col-md-2 control-label" })
+                <div class="col-md-6">
+                    @Html.DropDownListFor(m => m.NationalityId, nationalities, "--SELECT--", new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.Document, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        }
+        <div>
+            <button class="btn btn-sm btn-info" id="UpdatePersonInfo" type="button">Update info</button>
+        </div>
+    }
+    else
+    {
+        <div class="form-group row">
+            @Html.LabelFor(m => m.RoleId, new { @class = "col-md-2 control-label" })
+            <div class="col-md-6">
+                @Model.RoleName
+            </div>
+        </div>
+        <div class="form-group row">
+            @Html.LabelFor(m => m.DateBirth, new { @class = "col-md-2 control-label" })
+            <div class="col-md-6">
+                @Model.DateBirthValue
+            </div>
+        </div>
+        <div class="form-group row">
+            @Html.LabelFor(m => m.Gender, new { @class = "col-md-2 control-label" })
+            <div class="col-md-6">
+                @Model.GenderValue
+            </div>
+        </div>
+        <div class="form-group row">
+            @Html.LabelFor(m => m.NationalityId, new { @class = "col-md-2 control-label" })
+            <div class="col-md-6">
+                @Model.NationalityName
+            </div>
+        </div>
+    }
+</div>

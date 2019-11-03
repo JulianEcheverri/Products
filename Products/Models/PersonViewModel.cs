@@ -57,13 +57,19 @@ namespace Products.Models
         [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; }
 
-        public void LoadPerson(int id)
+        public string RoleName { get; set; }
+        public string DateBirthValue { get; set; }
+        public string AgeValue { get; set; }
+        public string GenderValue { get; set; }
+        public string NationalityName { get; set; }
+
+        public void LoadPerson(int id, bool about = false)
         {
             using (var db = new ApplicationDbContext())
             {
                 var user = db.Users.FirstOrDefault(x => x.PersonId == id);
                 if (user == null) return;
-                var role = db.UsersRoles.FirstOrDefault(x => x.UserId == user.Id);
+                var userRole = db.UsersRoles.FirstOrDefault(x => x.UserId == user.Id);
                 Id = user.Person.Id;
                 Document = user.Person.Document;
                 Name = user.Person.Name;
@@ -73,7 +79,16 @@ namespace Products.Models
                 DateBirth = user.Person.DateBirth;
                 Email = user.Email;
                 UserName = user.UserName;
-                RoleId = role != null ? role.RoleId : (int?)null;
+                RoleId = userRole != null ? userRole.RoleId : (int?)null;
+
+                if (about)
+                {
+                     RoleName = userRole != null ? userRole.Roles.Name : string.Empty ;
+                     DateBirthValue = user.Person.DateBirth.ToString("yyyy-MM-dd");
+                     AgeValue = user.Person.Age.ToString();
+                     GenderValue = user.Person.Gender.ToString();
+                     NationalityName = user.Person.Nationality.Name;
+                }
             }
         }
 

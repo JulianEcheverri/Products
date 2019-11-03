@@ -40,6 +40,7 @@ namespace Products.Models
         public DbSet<Person> Persons { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<IntUserRole> UsersRoles { get; set; }
+        public DbSet<UserLogin> UsersLogins { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {

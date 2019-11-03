@@ -8,7 +8,7 @@
     var loginRoute = Url.Action("Login", "Account",null); 
 }
 
-<h2>@ViewBag.Title.</h2>
+<h2>@ViewBag.Title</h2>
 
 @using (Html.BeginForm("UpdatePerson", "Person", FormMethod.Post, new { Id = "FormRegister", @class = "form-horizontal", data_usernameverification= userNameVerificationRoute, data_loginroute = loginRoute }))
 {

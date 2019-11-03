@@ -16,7 +16,6 @@ namespace Products.Controllers
 
         public ActionResult CreatePerson() 
         {
-          
             return PartialView("_CreatePerson");
         }
 
@@ -27,6 +26,8 @@ namespace Products.Controllers
             ModelState.Clear();
             return PartialView("_EditPerson", personViewModel);
         }
+
+
 
         public int? UpdatePerson(PersonViewModel personViewModel) 
         {

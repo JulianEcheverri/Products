@@ -1,41 +1,42 @@
-﻿@{
+﻿@using Products.Models;
+@using Microsoft.AspNet.Identity;
+@{
     ViewBag.Title = "Home Page";
+    var db = new ApplicationDbContext();
     var userAuthenticated = User.Identity.IsAuthenticated;
     var greeting = (userAuthenticated ? "Hi " + User.Identity.Name + "! " : string.Empty) + "Welcome to our products management";
+    var userId = userAuthenticated ? User.Identity.GetUserId<int>() : default(int);
+    var user = db.Users.FirstOrDefault(x => x.Id == userId);
+    var personViewModel = new PersonViewModel();
+    if (user != null)
+    {
+        personViewModel.LoadPerson(user.PersonId, true);
+    }
 }
 
-    <div class="jumbotron">
-        <h1>Products</h1>
-        <p class="lead">@greeting</p>
-        @if (userAuthenticated)
+<div class="jumbotron">
+    <h1>Products</h1>
+    <p class="lead">@greeting</p>
+    @if (userAuthenticated)
+    {
+        if (User.IsInRole("Admin"))
         {
-            if (User.IsInRole("Admin"))
-            {
-                <a class="btn btn-default" href="@Url.Action("Persons", "Person", null)">User manage</a>
-                <a class="btn btn-primary" href="@Url.Action("Persons", "Person", null)">Login history</a>
-            }
-            <button class="btn btn-warning" id="BtnLoginHistory">Products</button>
+            <a class="btn btn-default" href="@Url.Action("Persons", "Person", null)">User manage</a>
+            <a class="btn btn-primary" href="@Url.Action("LoginsHistory", "Account", null)">Login history</a>
         }
-    </div>
-
-<div class="row">
-    <div class="col-md-4">
-        <h2>Getting started</h2>
-        <p>
-            ASP.NET MVC gives you a powerful, patterns-based way to build dynamic websites that
-            enables a clean separation of concerns and gives you full control over markup
-            for enjoyable, agile development.
-        </p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301865">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Get more libraries</h2>
-        <p>NuGet is a free Visual Studio extension that makes it easy to add, remove, and update libraries and tools in Visual Studio projects.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301866">Learn more &raquo;</a></p>
-    </div>
-    <div class="col-md-4">
-        <h2>Web Hosting</h2>
-        <p>You can easily find a web hosting company that offers the right mix of features and price for your applications.</p>
-        <p><a class="btn btn-default" href="https://go.microsoft.com/fwlink/?LinkId=301867">Learn more &raquo;</a></p>
-    </div>
+        <button class="btn btn-warning" id="BtnLoginHistory">Products</button>
+    }
 </div>
+@if (userAuthenticated)
+{
+    <div class="row">
+        <div class="col-md-8">
+            <h2>About you</h2>
+            @Html.Partial("~/Views/Person/_AboutPerson.cshtml", personViewModel)
+        </div>
+    </div>
+}
+
+@section scripts{
+    <script type="text/javascript" src="@Url.Content("~/Scripts/home.js")"></script>
+}

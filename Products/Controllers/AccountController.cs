@@ -1,14 +1,14 @@
-﻿using System;
-using System.Globalization;
+﻿using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.Owin;
+using Microsoft.Owin.Security;
+using Products.Entities;
+using Products.Models;
+using System;
+using System.Data.Entity.Migrations;
 using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
-using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.Owin;
-using Microsoft.Owin.Security;
-using Products.Models;
 
 namespace Products.Controllers
 {
@@ -54,6 +54,17 @@ namespace Products.Controllers
 
         //
         // GET: /Account/Login
+
+        public ActionResult LoginsHistory()
+        {
+            using (var db = new ApplicationDbContext())
+            {
+                var userLogins = db.UsersLogins.Include("User").OrderBy(x => x.User.UserName).ThenByDescending(x => x.LoginDate).ToList();
+                return View(userLogins);
+            }
+        }
+
+
         [AllowAnonymous]
         public ActionResult Login(string returnUrl)
         {
@@ -79,6 +90,17 @@ namespace Products.Controllers
             switch (result)
             {
                 case SignInStatus.Success:
+                    var user = await UserManager.FindByNameAsync(model.UserName);
+                    using (var db = new ApplicationDbContext())
+                    {
+                        var userLogin = new UserLogin()
+                        {
+                            UserId = user.Id,
+                            LoginDate = DateTime.Now,
+                        };
+                        db.UsersLogins.AddOrUpdate(userLogin);
+                        db.SaveChanges();
+                    }
                     return RedirectToLocal(returnUrl);
                 case SignInStatus.LockedOut:
                     return View("Lockout");
@@ -90,6 +112,7 @@ namespace Products.Controllers
                     return View(model);
             }
         }
+
 
         //
         // GET: /Account/VerifyCode
@@ -382,6 +405,17 @@ namespace Products.Controllers
         [ValidateAntiForgeryToken]
         public ActionResult LogOff()
         {
+            using (var db = new ApplicationDbContext())
+            {
+                var userId = User.Identity.GetUserId<int>();
+                var userLogin = db.UsersLogins.Where(x => x.UserId == userId).OrderByDescending(x => x.LoginDate).FirstOrDefault();
+                if (userLogin != null)
+                {
+                    userLogin.LogOutDate = DateTime.Now;
+                    db.UsersLogins.AddOrUpdate(userLogin);
+                    db.SaveChanges();
+                }
+            }
             AuthenticationManager.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
             return RedirectToAction("Index", "Home");
         }

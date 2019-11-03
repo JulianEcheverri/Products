@@ -174,6 +174,7 @@
     <Compile Include="Entities\Nationality.cs" />
     <Compile Include="Entities\Person.cs" />
     <Compile Include="Entities\Product.cs" />
+    <Compile Include="Entities\UserLogin.cs" />
     <Compile Include="Enumerations\EGender.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -181,6 +182,10 @@
     <Compile Include="Migrations\201911031411411_DataBaseMigration.cs" />
     <Compile Include="Migrations\201911031411411_DataBaseMigration.Designer.cs">
       <DependentUpon>201911031411411_DataBaseMigration.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Migrations\201911032049409_UsersLogins.cs" />
+    <Compile Include="Migrations\201911032049409_UsersLogins.Designer.cs">
+      <DependentUpon>201911032049409_UsersLogins.cs</DependentUpon>
     </Compile>
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Models\AccountViewModels.cs" />
@@ -203,6 +208,7 @@
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <None Include="Scripts\jquery-3.3.1.intellisense.js" />
+    <Content Include="Scripts\home.js" />
     <Content Include="Scripts\jquery-3.3.1.js" />
     <Content Include="Scripts\jquery-3.3.1.min.js" />
     <Content Include="Scripts\jquery-3.3.1.slim.js" />
@@ -254,6 +260,8 @@
     <Content Include="Views\Person\Persons.cshtml" />
     <Content Include="Views\Person\_CreatePerson.cshtml" />
     <Content Include="Views\Person\_EditPerson.cshtml" />
+    <Content Include="Views\Account\LoginsHistory.cshtml" />
+    <Content Include="Views\Person\_AboutPerson.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -274,6 +282,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Migrations\201911031411411_DataBaseMigration.resx">
       <DependentUpon>201911031411411_DataBaseMigration.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Migrations\201911032049409_UsersLogins.resx">
+      <DependentUpon>201911032049409_UsersLogins.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <PropertyGroup>
