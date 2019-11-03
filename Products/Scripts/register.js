@@ -8,12 +8,15 @@
                 url: $form.attr('action'),
                 data: $form.serialize(),
                 success: function (result) {
-                    if (result == '')
+                    if (result == '') {
                         onFailure('The document already registered', true);
-                    else if (result == '0')
-                        onInfo('The username already registered', true);
-                    else
-                        onSuccess('You are registered!', true);
+
+                    }
+                    if (result == '0') {
+                        onInfo('The username already registered', true); 
+                    }
+                    onSuccess('You are registered!', true);
+                    setTimeout(function () { window.location.href = $form.data('loginroute'); }, 3000);
                 },
                 error: function (xhr) {
                     onFailure('Bad error'); console.log(xhr.responseText);
@@ -42,15 +45,5 @@
                 onFailure('Bad error'); console.log(xhr.responseText);
             }
         });
-    });
-
-    $(document).on('change', '#IdentificacionNueva, #TipoDeIdentificacionNuevaId', function () {
-        if ($('#IdentificacionNueva').val() == $('#Identificacion').val() && $('#TipoDeIdentificacionNuevaId').val() == $('#TipoDeIdentificacionId').val()) {
-            onInfo('La identificación anterior y la nueva son iguales. Por favor, ingrese una nueva');
-            $('#BtnGuardarCambioDeDocumentoDePersona').addClass('hide');
-        }
-        else {
-            $('#BtnGuardarCambioDeDocumentoDePersona').removeClass('hide');
-        }
     });
 });

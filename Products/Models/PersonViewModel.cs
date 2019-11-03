@@ -4,6 +4,7 @@ using Products.Enumerations;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Data.Entity;
 using System.Data.Entity.Migrations;
 using System.Linq;
 using System.Web;
@@ -33,6 +34,7 @@ namespace Products.Models
         [Display(Name= "Nationality")]
         public int NationalityId { get; set; }
 
+        [Display(Name= "Date Birth")]
         public DateTime DateBirth { get; set; }
 
         [Required]
@@ -42,7 +44,9 @@ namespace Products.Models
         [Display(Name= "User name")]
         public string UserName { get; set; }
 
-        [Required]
+        [Display(Name= "Role")]
+        public int? RoleId { get; set; }
+
         [StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 6)]
         [DataType(DataType.Password)]
         [Display(Name = "Password")]
@@ -53,28 +57,40 @@ namespace Products.Models
         [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; }
 
-        public List<Person> Persons { get; set; }
-
-        public void LoadPersons() 
+        public void LoadPerson(int id)
         {
             using (var db = new ApplicationDbContext())
             {
-                Persons = db.Persons.Include("Nationality").ToList();
+                var user = db.Users.FirstOrDefault(x => x.PersonId == id);
+                if (user == null) return;
+                var role = db.UsersRoles.FirstOrDefault(x => x.UserId == user.Id);
+                Id = user.Person.Id;
+                Document = user.Person.Document;
+                Name = user.Person.Name;
+                LastName = user.Person.LastName;
+                Gender = user.Person.Gender;
+                NationalityId = user.Person.NationalityId;
+                DateBirth = user.Person.DateBirth;
+                Email = user.Email;
+                UserName = user.UserName;
+                RoleId = role != null ? role.RoleId : (int?)null;
             }
         }
 
         public int? UpdatePerson() 
         {
+            var edit = default(bool);            
             using (var db = new ApplicationDbContext())
             {
                 var personRepeated = db.Persons.FirstOrDefault(x=>x.Document == Document && x.Id != Id);
                 if (personRepeated != null) return null;
                 var personInBd = db.Persons.FirstOrDefault(x => x.Document == Document);
+                var defaultUserRole = new ApplicationDbContext().Roles.FirstOrDefault(x => x.Name == "RegularUser");
+                RoleId = RoleId == null ? defaultUserRole != null ? defaultUserRole.Id : RoleId : RoleId;
                 if (personInBd == null)
                 {
                     var userNameRepeated = db.Users.FirstOrDefault(x => x.UserName == UserName);
                     if (userNameRepeated != null) return default(int);
-
                     var person = new Person()
                     {
                         Id = Id,
@@ -90,30 +106,79 @@ namespace Products.Models
                     db.Persons.AddOrUpdate(person);
                     db.SaveChanges();
                     Id = person.Id;
-                    return UserCreation() ? Id : -1;
                 }
                 else
                 {
                     personInBd.Name = Name;
                     personInBd.LastName = LastName;
-                    personInBd.Age = Age;
+                    personInBd.DateBirth = DateBirth;
+                    personInBd.Age = DateTime.Now.Year - DateBirth.Year;
                     personInBd.Gender = Gender;
                     personInBd.NationalityId = NationalityId;
                     personInBd.ModificationDate = DateTime.Now;
                     db.Persons.AddOrUpdate(personInBd);
                     db.SaveChanges();
+                    edit = true;
                 }
             }
-            return Id;
+            return UpdateUser(edit) ? Id : -1;
         }
 
-        public bool UserCreation()
+        public bool UpdateUser(bool edit = false)
         {
-            var user = new ApplicationUser { UserName = UserName, Email = Email, PersonId = Id };
-            var manager = new ApplicationUserManager(new IntUserStore(new ApplicationDbContext()));
-            var result = manager.Create(user, Password);
-            return result.Succeeded;
+            if (!edit)
+            {
+                var user = new ApplicationUser { UserName = UserName, Email = Email, PersonId = Id };
+                var manager = new ApplicationUserManager(new IntUserStore(new ApplicationDbContext()));
+                var result = manager.Create(user, Password);
+                RoleAssignment();
+                return result.Succeeded;
+            }
+            else
+            {
+                using (var db = new ApplicationDbContext())
+                {
+                    var user = db.Users.FirstOrDefault(x => x.PersonId == Id);
+                    if (user == null) return default;
+                    user.Email = Email;
+                    user.UserName = UserName;
+                    db.Users.AddOrUpdate(user);
+                    db.SaveChanges();
+                    RoleAssignment();
+                }
+            }
+            return true;
         }
+
+        public bool RoleAssignment()
+        {
+            using (var db = new ApplicationDbContext())
+            {
+                if (RoleId == null) return false;
+                var user = db.Users.FirstOrDefault(x => x.PersonId == Id);
+                if (user == null) return default;
+                var userRole = db.UsersRoles.FirstOrDefault(x => x.UserId == user.Id && x.RoleId == RoleId);
+                if (userRole != null) return true;
+
+                var userRoles = db.UsersRoles.Where(x => x.UserId == user.Id).ToList();
+                foreach (var item in userRoles)
+                {
+                    db.UsersRoles.Remove(item);
+                    db.SaveChanges();
+                }
+
+                var newUserRole = new IntUserRole()
+                {
+                    UserId = user.Id,
+                    RoleId = (int)RoleId
+                };
+
+                db.UsersRoles.AddOrUpdate(newUserRole);
+                db.SaveChanges();
+                return true;
+            }
+        }
+
 
         public int? DeletePerson() 
         {
@@ -128,11 +193,21 @@ namespace Products.Models
                 var products = db.Products.Where(x => x.CreatorUserId == user.Id).ToList();
                 if (products.Any() || products.Count() > default(int)) return -1;
 
+                var ownUser = HttpContext.Current.User.Identity.GetUserId<int>() == user.Id;
+                if (ownUser) return -2;
+
+                var userRoles = db.UsersRoles.Where(x => x.UserId == user.Id).ToList();
+                foreach (var item in userRoles)
+                {
+                    db.UsersRoles.Remove(item);
+                    db.SaveChanges();
+                }
+
                 db.Users.Remove(user);
                 db.Persons.Remove(person);
                 db.SaveChanges();
             }
-            return null;
+            return Id;
         }
     }
 }

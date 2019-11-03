@@ -1,20 +1,15 @@
 ﻿@using Products.Models
 @model Products.Models.PersonViewModel
 @{
-    ViewBag.Title = "Register";
     var db = new ApplicationDbContext();
     var nationalities = new SelectList(db.Nationalities.OrderBy(x => x.Name).Select(x => new { x.Id, Name = x.Name }).ToList(), "Id", "Name");
-    var userNameVerificationRoute = Url.Action("UserNameVerification", "Person",null); 
-    var loginRoute = Url.Action("Login", "Account",null); 
+    var userNameVerificationRoute = Url.Action("UserNameVerification", "Person", null);
+    var roles = new SelectList(db.Roles.OrderBy(x => x.Name).Select(x => new { x.Id, Name = x.Name }).ToList(), "Id", "Name");
 }
 
-<h2>@ViewBag.Title.</h2>
-
-@using (Html.BeginForm("UpdatePerson", "Person", FormMethod.Post, new { Id = "FormRegister", @class = "form-horizontal", data_usernameverification= userNameVerificationRoute, data_loginroute = loginRoute }))
+@using (Html.BeginForm("UpdatePerson", "Person", FormMethod.Post, new { Id = "FormCreateUser", @class = "form-horizontal", data_usernameverification = userNameVerificationRoute, data_success = "User created!", data_failure = "The user was not created" }))
 {
     @Html.AntiForgeryToken()
-    <h4>Create a new account.</h4>
-    <hr />
     <div class="form-group">
         @Html.LabelFor(m => m.Document, new { @class = "col-md-2 control-label" })
         <div class="col-md-10">
@@ -72,6 +67,13 @@
         </div>
     </div>
     <div class="form-group">
+        @Html.LabelFor(m => m.RoleId, new { @class = "col-md-2 control-label" })
+        <div class="col-md-10">
+            @Html.DropDownListFor(m => m.RoleId,roles, "--SELECT--", new { @class = "form-control" })
+            @Html.ValidationMessageFor(m => m.RoleId, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="form-group">
         @Html.LabelFor(m => m.Password, new { @class = "col-md-2 control-label" })
         <div class="col-md-10">
             @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
@@ -85,13 +87,4 @@
             @Html.ValidationMessageFor(m => m.ConfirmPassword, "", new { @class = "text-danger" })
         </div>
     </div>
-    <div class="form-group">
-        <div class="col-md-offset-2 col-md-10">
-            <button class="btn btn-default" id="BtnRegister">Register</button>
-        </div>
-    </div>
-}
-
-@section Scripts {
-    <script type="text/javascript" src="@Url.Content("~/Scripts/register.js")"></script>
 }

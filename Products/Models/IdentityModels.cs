@@ -39,6 +39,7 @@ namespace Products.Models
         public DbSet<Nationality> Nationalities { get; set; }
         public DbSet<Person> Persons { get; set; }
         public DbSet<Product> Products { get; set; }
+        public DbSet<IntUserRole> UsersRoles { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {

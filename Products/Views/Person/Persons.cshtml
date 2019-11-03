@@ -1,0 +1,77 @@
+﻿@using Products.Models
+@model IEnumerable<Products.Models.ApplicationUser>
+@{
+    var db = new ApplicationDbContext();
+}
+
+<div id="Users" class="row"
+     data-create="@Url.Action("CreatePerson", "Person")"
+     data-edit="@Url.Action("EditPerson", "Person")"
+     data-delete="@Url.Action("DeletePerson", "Person")">
+    <div class="row text-center">
+        <h2>Users</h2>
+        <button id="BtnCreateUser" class="btn btn-success btn-sm text-center">New</button>
+    </div>
+    <br />
+    <div class="row">
+        <table class="table table-hover table-bordered table-responsive" id="TableUsers">
+            <thead>
+                <tr class="text-left alert-info"">
+                    <th>Name</th>
+                    <th>Last name</th>
+                    <th>Date birth</th>
+                    <th>Age</th>
+                    <th>Gender</th>
+                    <th>Nationality</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>User name</th>
+                    <th>Options</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    var person = item.Person;
+                    var role = db.UsersRoles.FirstOrDefault(x => x.UserId == item.Id);
+                    <tr class="text-left">
+                        <td class="name">@person.Name</td>
+                        <td class="lastName">@person.LastName</td>
+                        <td class="dateBirth">@person.DateBirth.ToString("yyyy-MM-dd")</td>
+                        <td class="age">@person.Age</td>
+                        <td class="gender">@person.Gender.ToString()</td>
+                        <td class="nationality">@person.Nationality.Name</td>
+                        <td class="email">@item.Email</td>
+                        <td class="role">@(role != null ? role.Roles.Name : "-")</td>
+                        <td class="userName">@item.UserName</td>
+                        <td>
+                            <button class="btn btn-info btn-sm editUser" data-personid="@item.Person.Id">Edit</button>
+                            <button class="btn btn-danger btn-sm deleteUser" data-personid="@item.Person.Id">Delete</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div id="ModalUserManage" class="modal fade" data-backdrop="static" role="dialog" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title text-center"></h4>
+            </div>
+            <div class="modal-body"></div>
+            <div class="modal-footer">
+                <button id="SaveOrUdpateUser" class="btn btn-success btn-sm">Save</button>
+                <button id="DeleteUser" class="btn btn-danger btn-sm hide">Delete</button>
+                <button class="btn btn-default btn-sm" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts{
+    <script type="text/javascript" src="@Url.Content("~/Scripts/person.js")"></script>
+}
