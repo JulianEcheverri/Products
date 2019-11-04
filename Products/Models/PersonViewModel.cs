@@ -2,9 +2,7 @@
 using Products.Entities;
 using Products.Enumerations;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Data.Entity;
 using System.Data.Entity.Migrations;
 using System.Linq;
 using System.Web;
@@ -14,7 +12,8 @@ namespace Products.Models
     public class PersonViewModel
     {
         public int Id { get; set; }
-        [Required, StringLength(12)]
+        [Required]
+        [RegularExpression(@"^[0-9'-']{1,12}$", ErrorMessage = "{0} should only contain numbers and at least 12 characters long")]
         public string Document { get; set; }
         
         [Required]
