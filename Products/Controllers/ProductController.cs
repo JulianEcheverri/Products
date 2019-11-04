@@ -38,7 +38,7 @@ namespace Products.Controllers
             }
         }
 
-        [Authorize(Roles = "RegularUser, Admin")]
+        [Authorize(Roles = "RegularUser")]
         public ActionResult ProductsReserve()
         {
             using (var db = new ApplicationDbContext())

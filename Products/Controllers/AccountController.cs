@@ -52,9 +52,8 @@ namespace Products.Controllers
             }
         }
 
-        //
-        // GET: /Account/Login
-
+        
+        [Authorize(Roles = "Admin")]
         public ActionResult LoginsHistory()
         {
             using (var db = new ApplicationDbContext())
@@ -69,7 +68,18 @@ namespace Products.Controllers
         public ActionResult Login(string returnUrl)
         {
             ViewBag.ReturnUrl = returnUrl;
+            if (!string.IsNullOrEmpty(returnUrl))
+            {
+                return RedirectToAction("RestrictedPage");
+            }
             return View();
+        }
+
+
+        [AllowAnonymous]
+        public ActionResult RestrictedPage()
+        {
+            return View("RestrictedPage");
         }
 
         //

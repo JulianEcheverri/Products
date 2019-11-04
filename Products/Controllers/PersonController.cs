@@ -8,17 +8,20 @@ namespace Products.Controllers
 {
     public class PersonController : Controller
     {
+        [Authorize(Roles = "Admin")]
         public ActionResult Persons()
         {
             var users = new ApplicationDbContext().Users.Include("Person").Include("Person.Nationality").ToList();
             return View(users);
         }
 
+        [Authorize(Roles = "Admin")]
         public ActionResult CreatePerson() 
         {
             return PartialView("_CreatePerson");
         }
 
+        [Authorize(Roles = "Admin")]
         public ActionResult EditPerson(int personid)
         {
             var personViewModel = new PersonViewModel();
@@ -26,8 +29,6 @@ namespace Products.Controllers
             ModelState.Clear();
             return PartialView("_EditPerson", personViewModel);
         }
-
-
 
         public int? UpdatePerson(PersonViewModel personViewModel) 
         {

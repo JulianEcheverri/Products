@@ -208,6 +208,9 @@ namespace Products.Models
                 var products = db.Products.Where(x => x.CreatorUserId == user.Id).ToList();
                 if (products.Any() || products.Count() > default(int)) return -1;
 
+                var productsReserve = db.ProductsReserve.Where(x => x.UserId == user.Id).ToList();
+                if (productsReserve.Any() || productsReserve.Count() > default(int)) return -1;
+
                 var ownUser = HttpContext.Current.User.Identity.GetUserId<int>() == user.Id;
                 if (ownUser) return -2;
 
@@ -215,6 +218,13 @@ namespace Products.Models
                 foreach (var item in userRoles)
                 {
                     db.UsersRoles.Remove(item);
+                    db.SaveChanges();
+                }
+
+                var userLogins = db.UsersLogins.Where(x => x.UserId == user.Id).ToList();
+                foreach (var item in userLogins)
+                {
+                    db.UsersLogins.Remove(item);
                     db.SaveChanges();
                 }
 

@@ -297,6 +297,7 @@
     <Content Include="Views\Product\ProductsReserve.cshtml" />
     <Content Include="Views\Product\ProductsAdmin.cshtml" />
     <Content Include="Views\VerificationKey\_VerificationKey.cshtml" />
+    <Content Include="Views\Shared\RestrictedPage.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
