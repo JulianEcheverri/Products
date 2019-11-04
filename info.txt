@@ -1,0 +1,2 @@
+Please change the connection string in the web config 
+Run "update-database" command in nuget package console to create te database
