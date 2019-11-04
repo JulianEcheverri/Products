@@ -6,7 +6,9 @@
 @{
     Layout = "~/Views/Shared/_Layout.cshtml";
     var db = new ApplicationDbContext();
-    var jsonProductList = new JavaScriptSerializer().Serialize(new List<Product>());
+    var defaultProductList = new List<Product>();
+    var serializer = new JavaScriptSerializer();
+    var jsonProductList = serializer.Serialize(defaultProductList);
     var userId = User.Identity.GetUserId<int>();
 }
 <div class="row text-center">
@@ -17,7 +19,7 @@
 {
     if (User.IsInRole("Admin"))
     {
-        <div id="Products" class="row" data-updateamount="@Url.Action("UpdateAmount", "Product")" data-productlist="@jsonProductList">
+        <div id="Products" class="row" data-updateamount="@Url.Action("UpdateAmount", "Product")" data-productlist="@(jsonProductList)">
             <div class="row">
                 <table class="table table-bordered table-striped table-responsive" id="TableProducts">
                     <thead>
@@ -31,16 +33,17 @@
                         {
                             <tr class="text-left trProduct" data-productid="@item.Id">
                                 <td class="description">@item.Description</td>
-                                <td class="amount" data-amount="@item.Amount">@Html.TextBox("Amount-" + item.Id, item.Amount, new { type = "number", step = "1", min = "0", @class = "amount form-control" })</td>
+                                <td class="amount" data-amount="@item.Amount">@Html.TextBox("Amount-" + item.Id, item.Amount, new { type = "number", step = "1", min = "0", @class = "amountInput form-control" })</td>
                             </tr>
                         }
                     </tbody>
                 </table>
             </div>
+            <div class="row text-center"><button class="btn btn-success btn-sm" id="UpdateProductAmount">Update Amount</button></div>
         </div>
     }
 
-    <div id="ModalKeyVerification" class="modal fade" data-backdrop="static" role="dialog" tabindex="-1">
+    <div id="ModalKeyVerification" class="modal fade" data-backdrop="static" role="dialog" tabindex="-1" data-url="@Url.Action("VerificationForm", "VerificationKey")">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -49,7 +52,7 @@
                 </div>
                 <div class="modal-body"></div>
                 <div class="modal-footer">
-                    <button id="VerifyKeyVerification" class="btn btn-success btn-sm" type="button" data-url="@Url.Action("VerifyKeyVerification", "Product")">Verify</button>
+                    <button id="Verify" class="btn btn-success btn-sm" type="button">Verify</button>
                     <button class="btn btn-default btn-sm" data-dismiss="modal">Close</button>
                 </div>
             </div>

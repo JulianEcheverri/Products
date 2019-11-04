@@ -1,0 +1,26 @@
+﻿@using Products.Models
+@model Products.Models.VerificationKeyViewModel
+
+@{
+
+}
+
+@using (Html.BeginForm("VerificationKeyValue", "VerificationKey", FormMethod.Post, new { Id = "FormVerificationKeyValue", @class = "form-horizontal", data_success = "Amount update", data_failure = "Amount was not update" }))
+{
+    @Html.AntiForgeryToken()
+    <div class="form-group">
+        @Html.LabelFor(m => m.VerificationName, new { @class = "col-md-3 control-label" })
+        <div class="col-md-8">
+            @Html.TextBoxFor(m => m.VerificationName, new { @class = "form-control" })
+            @Html.ValidationMessageFor(m => m.VerificationName, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="form-group">
+        @Html.LabelFor(m => m.Key, new { @class = "col-md-3 control-label" })
+        <div class="col-md-8">
+            @Html.TextBoxFor(m => m.Key, new { @class = "form-control" })
+            @Html.ValidationMessageFor(m => m.Key, "", new { @class = "text-danger" })
+        </div>
+    </div>
+}
+

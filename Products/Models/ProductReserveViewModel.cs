@@ -56,5 +56,23 @@ namespace Products.Models
             }
             return true;
         }
+
+        public bool UpdateProductListAmount()
+        {
+            using (var db = new ApplicationDbContext())
+            {
+                if (Products == null) return default;
+                if (Products.Any() || Products != null)
+                {
+                    foreach (var item in Products)
+                    {
+                        ProductId = item.Id;
+                        Amount = item.Amount;
+                        UpdateProductAmount();
+                    }
+                }
+            }
+            return true;
+        }
     }
 }

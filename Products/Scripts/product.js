@@ -1,12 +1,11 @@
 ﻿$(function () {
-    $('.amount').on('change', function () {
+    $('.amountInput').on('change', function () {
         var $this = $(this);
         var amount = parseInt($this.val());
         if (amount < 0) {
             $this.val(parseInt($this.parent().data('amount')));
             return;
         }
-        if (!keyVerification()) return;
 
         var products = {};
         var $tr = $this.parents('.trProduct');
@@ -24,18 +23,61 @@
     });
 
     $('#UpdateProductAmount').on('click', function () {
+        var $ModalKeyVerification = $('#ModalKeyVerification');
+
+        var productlist = $('#Products').data('productlist');
+        if (productlist.length <= 0) {
+            onInfo('You must modify some value');
+            return;
+        }
         $.ajax({
             type: 'POST',
-            url: $('#Products').data('updateamount'),
-            data: {
-                Products: $('#Products').data('productlist')
-            },
-            success: function (data) {
-
-
+            url: $ModalKeyVerification.data('url'),
+            success: function (view) {
+                $ModalKeyVerification.find('.modal-title').text('Verification');
+                $ModalKeyVerification.find('.modal-body').html(view);
+                $ModalKeyVerification.modal();
+                $.validator.unobtrusive.parse('#FormVerificationKeyValue');
             },
             error: function () { onFailure(errorMessage); }
         });
+    });
+
+    $('#Verify').on('click', function () {
+        var $ModalKeyVerification = $('#ModalKeyVerification');
+        var $form = $ModalKeyVerification.find('.modal-body').find('form');
+        if ($form.length <= 0) {
+            $ModalKeyVerification.modal('hide');
+            return;
+        }
+        var productlist = $('#Products').data('productlist');
+        if (productlist.length <= 0) {
+            onInfo('You must modify some value');
+            return;
+        }
+        if ($form.valid()) {
+            if (keyVerification($form) == 'False') {
+                onFailure('Incorrect verification data');
+                return;
+            }               
+            $.ajax({
+                type: 'POST',
+                url: $('#Products').data('updateamount'),
+                data: {
+                    Products: productlist
+                },
+                success: function (result) {
+                    $('#Products').data('productlist', []);
+                    if (result == 'True') {
+                        onSuccess('Amount modified correctly');
+                        $ModalKeyVerification.modal('hide');
+                        return;
+                    }
+                    onFailure('Could not change amount');
+                },
+                error: function () { onFailure(errorMessage); }
+            });
+        }
     });
 
     $('.reserveProduct').on('click', function () {
@@ -69,22 +111,22 @@
 });
 
 
-function keyVerification() {
-    $.ajax({
-        type: 'POST',
-        async: false,
-        url: $(this).data('url'),
-        data: {
-            User: $('#User').val(),
-            VerificationCode: $('#VerificationCode').val()
-        },
-        success: function (check) {
-            if (check == 'True') {
-                onSuccess('Correct verification');
-                return;
-            }
-            onFailure('Incorrect verification data');
-        },
-        error: function () { onFailure('Incorrect verification data'); }
-    });
+function keyVerification($form) {
+    var verification = 'False';
+    if ($form.valid()) {
+        $.ajax({
+            type: 'POST',
+            async: false,
+            url: $form.attr('action'),
+            data: {
+                VerificationName: $('#VerificationName').val(),
+                Key: $('#Key').val()
+            },
+            success: function (check) {
+                verification = check;
+            },
+            error: function () { onFailure('Incorrect verification data'); }
+        });
+        return verification; 
+    }
 }

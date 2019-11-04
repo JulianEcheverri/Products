@@ -1,9 +1,7 @@
 ﻿using Microsoft.AspNet.Identity;
 using Products.Models;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Web;
+using System.Net.Http;
 using System.Web.Mvc;
 
 namespace Products.Controllers
@@ -51,6 +49,7 @@ namespace Products.Controllers
             }
         }
 
+        [HttpPost]
         public int? ReserveProduct(ProductReserveViewModel productReserveViewModel)
         {
             productReserveViewModel.UserId = User.Identity.GetUserId<int>();
@@ -59,7 +58,7 @@ namespace Products.Controllers
 
         public bool UpdateAmount(ProductReserveViewModel productReserveViewModel)
         {
-            return productReserveViewModel.UpdateProductAmount();
+            return productReserveViewModel.UpdateProductListAmount();
         }
     }
 }
