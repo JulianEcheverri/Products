@@ -1,0 +1,57 @@
+﻿@using Products.Models
+@using Products.Entities
+@using Microsoft.AspNet.Identity;
+@using System.Web.Script.Serialization;
+@model IEnumerable<Products.Entities.Product>
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var db = new ApplicationDbContext();
+    var jsonProductList = new JavaScriptSerializer().Serialize(new List<Product>());
+    var userId = User.Identity.GetUserId<int>();
+}
+<div class="row text-center">
+    <h2>Products</h2>
+    <br />
+</div>
+@if (User.IsInRole("RegularUser"))
+{
+    <div id="Products" class="row" data-reserve="@Url.Action("ReserveProduct", "Product")">
+        <div class="row">
+            <table class="table table-bordered table-striped table-responsive" id="TableProducts">
+                <thead>
+                    <tr class="text-left alert-info">
+                        <th style="width:80%">Description</th>
+                        <th>Amount</th>
+                        <th>Options</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        var reserve = db.ProductsReserve.FirstOrDefault(x => x.ProductId == item.Id && x.UserId == userId);
+                        <tr class="text-left trProduct">
+                            <td>@item.Description</td>
+                            <td class="amount">@item.Amount</td>
+                            <td>
+                                @if (reserve != null)
+                                {
+                                    <span>You have already booked this product</span>
+                                    continue;
+                                }
+                                @if (item.Amount <= 0)
+                                {
+                                    <span>There are no products</span>
+                                    continue;
+                                }
+                                <button class="btn btn-success btn-sm reserveProduct" data-productid="@item.Id">Reserve</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+@section scripts{
+    <script type="text/javascript" src="@Url.Content("~/Scripts/product.js")"></script>
+}

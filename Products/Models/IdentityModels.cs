@@ -41,6 +41,7 @@ namespace Products.Models
         public DbSet<Product> Products { get; set; }
         public DbSet<IntUserRole> UsersRoles { get; set; }
         public DbSet<UserLogin> UsersLogins { get; set; }
+        public DbSet<ProductReserve> ProductsReserve { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {

@@ -14,19 +14,25 @@
     }
 }
 
-<div class="jumbotron">
-    <h1>Products</h1>
-    <p class="lead">@greeting</p>
-    @if (userAuthenticated)
-    {
-        if (User.IsInRole("Admin"))
+    <div class="jumbotron">
+        <h1>Products</h1>
+        <p class="lead">@greeting</p>
+        @if (userAuthenticated)
         {
-            <a class="btn btn-default" href="@Url.Action("Persons", "Person", null)">User manage</a>
-            <a class="btn btn-primary" href="@Url.Action("LoginsHistory", "Account", null)">Login history</a>
+            if (User.IsInRole("Admin"))
+            {
+                <a class="btn btn-default" href="@Url.Action("Persons", "Person")">User manage</a>
+                <a class="btn btn-primary" href="@Url.Action("LoginsHistory", "Account")">Login history</a>
+                <a class="btn btn-success" href="@Url.Action("ProductsReserveAdmin", "Product")">Products Reservations</a>
+                <a class="btn btn-warning" href="@Url.Action("ProductsAdmin", "Product")">Products</a>
+            }
+            else
+            {
+                <a class="btn btn-success" href="@Url.Action("ProductsReserve", "Product")">My Reservations</a>
+                <a class="btn btn-warning" href="@Url.Action("Products", "Product")">Products</a>
+            }
         }
-        <button class="btn btn-warning" id="BtnLoginHistory">Products</button>
-    }
-</div>
+    </div>
 @if (userAuthenticated)
 {
     <div class="row">

@@ -17,7 +17,7 @@ namespace Products.Entities
         public int Amount { get; set; }
         public int CreatorUserId { get; set; }
         public DateTime CreationDate { get; set; }
-        public DateTime ModificationDate { get; set; }
+        public DateTime? ModificationDate { get; set; }
         public ApplicationUser CreatorUser { get; set; }
     }
 }

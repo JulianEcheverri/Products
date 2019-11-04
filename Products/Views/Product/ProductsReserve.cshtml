@@ -1,0 +1,37 @@
+﻿@using Products.Models
+@model IEnumerable<Products.Entities.ProductReserve>
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<div class="row text-center">
+    <h2>My Reservations</h2>
+    <br />
+</div>
+@if (Model.Any() || Model.Count() > 0)
+{
+    <div id="ProductReserve" class="row">
+        <div class="row">
+            <table class="table table-bordered table-responsive" id="TableProductReserve">
+                <thead>
+                    <tr class="text-center alert-info">
+                        <th class="text-center">Description</th>
+                        <th class="text-center">Reservation Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr class="text-center">
+                            <td>@item.Product.Description</td>
+                            <td>@item.Product.CreationDate</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+else
+{
+    <div class="alert-danger alert-info">Ther are not reservations</div>
+}

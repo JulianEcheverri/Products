@@ -1,0 +1,62 @@
+﻿@using Products.Models
+@model IEnumerable<Products.Entities.Product>
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var db = new ApplicationDbContext();
+}
+<div class="row text-center">
+    <h2>Reservations</h2>
+    <br />
+</div>
+@if (User.IsInRole("Admin"))
+{
+    if (Model.Any() || Model.Count() > 0)
+    {
+        <div id="ProductReserve" class="row">
+            <div class="row">
+                <table class="table table-bordered table-responsive" id="TableProductReserve">
+                    <thead>
+                        <tr class="text-center alert-info">
+                            <th colspan="3" class="text-center">Reservations</th>
+                        </tr>
+                        <tr class="alert-warning">
+                            <th>Document</th>
+                            <th>Name</th>
+                            <th>Reservation Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr class="text-center alert-success">
+                                <td class="description" colspan="3">@item.Description</td>
+                            </tr>
+                            var reserveList = db.ProductsReserve.Include("User.Person").Where(x => x.ProductId == item.Id).ToList();
+                            if (reserveList.Any() || reserveList.Count() > 0)
+                            {
+                                foreach (var reserve in reserveList)
+                                {
+                                    <tr>
+                                        <td>@reserve.User.Person.Document</td>
+                                        <td>@(reserve.User.Person.Name + " " + reserve.User.Person.LastName)</td>
+                                        <td>@reserve.CreationDate.ToString("yyyy-MM-dd")</td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr>
+                                    <td colspan="3">There are not reservations</td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+    else
+    {
+       <div class="alert-danger alert-info">Ther are not reservations</div>
+    }
+}
